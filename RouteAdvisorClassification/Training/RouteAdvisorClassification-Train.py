@@ -271,7 +271,7 @@ def main():
             os.remove(f"{PATH}/Training/TensorBoard-Logs/{obj}")
 
     # Tensorboard setup
-    summary_writer = SummaryWriter(f"{PATH}/Training/TensorBoard-Logs", comment="Classification-Training", flush_secs=20)
+    summary_writer = SummaryWriter(f"{PATH}/Training/TensorBoard-Logs", comment="RouteAdvisorClassification-Training", flush_secs=20)
 
     # Transformations
     train_transform = transforms.Compose([
@@ -533,7 +533,7 @@ def main():
     for i in range(5):
         try:
             last_model = torch.jit.script(model)
-            torch.jit.save(last_model, os.path.join(MODEL_PATH, f"ClassificationModel-LAST-{TRAINING_DATE}.pt"), _extra_files=metadata)
+            torch.jit.save(last_model, os.path.join(MODEL_PATH, f"RouteAdvisorClassificationModel-LAST-{TRAINING_DATE}.pt"), _extra_files=metadata)
             last_model_saved = True
             break
         except:
@@ -617,7 +617,7 @@ def main():
     for i in range(5):
         try:
             best_model = torch.jit.script(best_model)
-            torch.jit.save(best_model, os.path.join(MODEL_PATH, f"ClassificationModel-BEST-{TRAINING_DATE}.pt"), _extra_files=metadata)
+            torch.jit.save(best_model, os.path.join(MODEL_PATH, f"RouteAdvisorClassificationModel-BEST-{TRAINING_DATE}.pt"), _extra_files=metadata)
             best_model_saved = True
             break
         except:
