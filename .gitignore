@@ -1,0 +1,10 @@
+# Ignore the Datasets
+/RouteAdvisorClassification/Dataset/*
+!/RouteAdvisorClassification/Dataset/*.md
+
+# Ignore the Models
+/RouteAdvisorClassification/Models/*
+!/RouteAdvisorClassification/Models/*.md
+
+# Ignore the Logs
+/RouteAdvisorClassification/Training/TensorBoard-Logs
