@@ -14,14 +14,14 @@ int main() {
 		CurrentTime = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch()).count() / 1000000000.0;
 		StartTime = CurrentTime;
 
+		if (CurrentTime > LastScreenCaptureCheck + 0.5) {
+			auto [MapTopLeft, MapBottomRight, ArrowTopLeft, ArrowBottomRight] = ScreenCapture::GetRouteAdvisorPosition("Automatic");
+			ScreenCapture::SetCaptureArea(std::get<0>(MapTopLeft), std::get<1>(MapTopLeft), std::get<0>(MapBottomRight), std::get<1>(MapBottomRight));
+		}
+
 		Frame = ScreenCapture::GetLatestFrame();
 		cv::imshow("Frame", Frame);
 		cv::waitKey(1);
-
-		//auto [MapTopLeft, MapBottomRight, ArrowTopLeft, ArrowBottomRight] = ScreenCapture::GetRouteAdvisorPosition("Automatic");
-		//Screenshot = ScreenCapture::TakeScreenshot(std::get<0>(MapTopLeft), std::get<1>(MapTopLeft), std::get<0>(MapBottomRight), std::get<1>(MapBottomRight));
-		//cv::imshow("Screenshot", Screenshot);
-		//cv::waitKey(1);
 
 		EndTime = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch()).count() / 1000000000.0;
 

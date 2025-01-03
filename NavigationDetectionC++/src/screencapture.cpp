@@ -2,6 +2,10 @@
 
 int ScreenWidth = GetSystemMetrics(SM_CXSCREEN);
 int ScreenHeight = GetSystemMetrics(SM_CYSCREEN);
+int CaptureX = 0;
+int CaptureY = 0;
+int CaptureWidth = ScreenWidth;
+int CaptureHeight = ScreenHeight;
 HDC hScreenDC = GetDC(NULL);
 HDC hMemoryDC = CreateCompatibleDC(hScreenDC);
 HBITMAP hBitmap = CreateCompatibleBitmap(hScreenDC, ScreenWidth, ScreenHeight);
@@ -16,21 +20,34 @@ std::unordered_map<std::string, std::tuple<std::tuple<int, int>, std::tuple<int,
 cv::Mat ScreenCapture::GetLatestFrame() {
     SelectObject(hMemoryDC, hBitmap);
 
-    BitBlt(hMemoryDC, 0, 0, ScreenWidth, ScreenHeight, hScreenDC, 0, 0, SRCCOPY);
+    BitBlt(hMemoryDC, 0, 0, CaptureWidth, CaptureHeight, hScreenDC, CaptureX, CaptureY, SRCCOPY);
 
-    cv::Mat Frame(ScreenHeight, ScreenWidth, CV_8UC4);
+    cv::Mat Frame(CaptureHeight, CaptureWidth, CV_8UC4);
 
     BITMAPINFOHEADER bi = {0};
     bi.biSize = sizeof(BITMAPINFOHEADER);
-    bi.biWidth = ScreenWidth;
-    bi.biHeight = -ScreenHeight;
+    bi.biWidth = CaptureWidth;
+    bi.biHeight = -CaptureHeight;
     bi.biPlanes = 1;
     bi.biBitCount = 32;
     bi.biCompression = BI_RGB;
 
-    GetDIBits(hMemoryDC, hBitmap, 0, ScreenHeight, Frame.data, (BITMAPINFO*)&bi, DIB_RGB_COLORS);
+    GetDIBits(hMemoryDC, hBitmap, 0, CaptureHeight, Frame.data, (BITMAPINFO*)&bi, DIB_RGB_COLORS);
 
     return Frame;
+}
+
+
+void ScreenCapture::SetCaptureArea(int X1, int Y1, int X2, int Y2) {
+    if (CaptureX != X1 || CaptureY != Y1 || CaptureWidth != X2 - X1 || CaptureHeight != Y2 - Y1) {
+        CaptureX = X1;
+        CaptureY = Y1;
+        CaptureWidth = X2 - X1;
+        CaptureHeight = Y2 - Y1;
+        hScreenDC = GetDC(NULL);
+        hMemoryDC = CreateCompatibleDC(hScreenDC);
+        hBitmap = CreateCompatibleBitmap(hScreenDC, CaptureWidth, CaptureHeight);
+    }
 }
 
 

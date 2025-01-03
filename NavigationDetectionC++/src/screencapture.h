@@ -15,6 +15,7 @@
 class ScreenCapture {
 public:
     static cv::Mat GetLatestFrame();
+    static void SetCaptureArea(int X1, int Y1, int X2, int Y2);
     static cv::Mat TakeScreenshot(int X1, int Y1, int X2, int Y2);
     static std::tuple<int, int, int, int> GetScreenDimensions(int Display);
     static int GetScreenIndex(int X, int Y);
