@@ -9,7 +9,9 @@ HBITMAP hBitmap = CreateCompatibleBitmap(hScreenDC, ScreenWidth, ScreenHeight);
 std::unordered_map<int, std::tuple<int, int, int, int>> ScreenDimensionsCache = {};
 std::unordered_map<std::string, int> ScreenIndexCache = {};
 std::unordered_map<std::string, std::tuple<int, int, int, int>> ValidateCaptureAreaCache = {};
-std::unordered_map<std::string, std::tuple<bool, double>> IsForegroundWindowCache = {};
+std::unordered_map<std::string, std::tuple<bool, double>> ForegroundWindowCache = {};
+std::unordered_map<std::string, std::tuple<int, int, int, int, double>> WindowPositionCache = {};
+std::unordered_map<std::string, std::tuple<std::tuple<int, int>, std::tuple<int, int>, std::tuple<int, int>, std::tuple<int, int>, double>> RouteAdvisorPositionCache = {};
 
 cv::Mat ScreenCapture::GetLatestFrame() {
     SelectObject(hMemoryDC, hBitmap);
@@ -149,11 +151,11 @@ std::tuple<int, int, int, int> ScreenCapture::ValidateCaptureArea(int Display, i
 
 bool ScreenCapture::IsForegroundWindow(std::string Name, std::vector<std::string> Blacklist) {
     std::string Key = Name;
-    for (const auto& item : Blacklist) { Key += item; }
-    auto CurrentTime = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch()).count() / 1000000000.0;
-    std::unordered_map<std::string, std::tuple<bool, double>>::iterator CachedValue = IsForegroundWindowCache.find(Key);
-    if (CachedValue != IsForegroundWindowCache.end() && CurrentTime < std::get<1>(IsForegroundWindowCache.at(Key)) + 0.5) {
-        return std::get<0>(IsForegroundWindowCache.at(Key));
+    for (const std::string& Item : Blacklist) { Key += Item; }
+    double CurrentTime = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch()).count() / 1000000000.0;
+    std::unordered_map<std::string, std::tuple<bool, double>>::iterator CachedValue = ForegroundWindowCache.find(Key);
+    if (CachedValue != ForegroundWindowCache.end() && CurrentTime < std::get<1>(ForegroundWindowCache.at(Key)) + 0.5) {
+        return std::get<0>(ForegroundWindowCache.at(Key));
     }
     HWND ForegroundHWND = GetForegroundWindow();
     if (ForegroundHWND == NULL) {
@@ -166,12 +168,19 @@ bool ScreenCapture::IsForegroundWindow(std::string Name, std::vector<std::string
     bool ContainsBlacklist = std::any_of(Blacklist.begin(), Blacklist.end(), [&ForegroundWindowText](const std::string& BlacklistItem) {
         return !BlacklistItem.empty() && (ForegroundWindowText.find(BlacklistItem) != std::string::npos);
     });
-    IsForegroundWindowCache[Key] = std::make_tuple(ContainsName && !ContainsBlacklist, CurrentTime);
+    ForegroundWindowCache[Key] = std::make_tuple(ContainsName && !ContainsBlacklist, CurrentTime);
     return ContainsName && !ContainsBlacklist;
 }
 
 
 std::tuple<int, int, int, int> ScreenCapture::GetWindowPosition(std::string Name, std::vector<std::string> Blacklist) {
+    std::string Key = Name;
+    for (const std::string& Item : Blacklist) { Key += Item; }
+    double CurrentTime = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch()).count() / 1000000000.0;
+    std::unordered_map<std::string, std::tuple<int, int, int, int, double>>::iterator CachedValue = WindowPositionCache.find(Key);
+    if (CachedValue != WindowPositionCache.end() && CurrentTime < std::get<4>(WindowPositionCache.at(Key)) + 0.5) {
+        return std::make_tuple(std::get<0>(WindowPositionCache.at(Key)), std::get<1>(WindowPositionCache.at(Key)), std::get<2>(WindowPositionCache.at(Key)), std::get<3>(WindowPositionCache.at(Key)));
+    }
     HWND hwnd = NULL;
     std::vector<std::pair<HWND, std::string>> TopWindows;
     EnumWindows([](HWND hwnd, LPARAM lParam) -> BOOL {
@@ -197,16 +206,24 @@ std::tuple<int, int, int, int> ScreenCapture::GetWindowPosition(std::string Name
             int Y = TopLeft.y;
             int Width = BottomRight.x - TopLeft.x;
             int Height = BottomRight.y - TopLeft.y;
+            WindowPositionCache[Key] = std::make_tuple(0, 0, ScreenWidth, ScreenHeight, CurrentTime);
             return {X, Y, X + Width, Y + Height};
         }
     }
     int ScreenWidth = GetSystemMetrics(SM_CXSCREEN);
     int ScreenHeight = GetSystemMetrics(SM_CYSCREEN);
+    WindowPositionCache[Key] = std::make_tuple(0, 0, ScreenWidth, ScreenHeight, CurrentTime);
     return {0, 0, ScreenWidth, ScreenHeight};
 }
 
 
 std::tuple<std::tuple<int, int>, std::tuple<int, int>, std::tuple<int, int>, std::tuple<int, int>> ScreenCapture::GetRouteAdvisorPosition(std::string Side) {
+    std::string Key = Side;
+    double CurrentTime = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch()).count() / 1000000000.0;
+    std::unordered_map<std::string, std::tuple<std::tuple<int, int>, std::tuple<int, int>, std::tuple<int, int>, std::tuple<int, int>, double>>::iterator CachedValue = RouteAdvisorPositionCache.find(Key);
+    if (CachedValue != RouteAdvisorPositionCache.end() && CurrentTime < std::get<4>(RouteAdvisorPositionCache.at(Key)) + 0.5) {
+        return std::make_tuple(std::get<0>(RouteAdvisorPositionCache.at(Key)), std::get<1>(RouteAdvisorPositionCache.at(Key)), std::get<2>(RouteAdvisorPositionCache.at(Key)), std::get<3>(RouteAdvisorPositionCache.at(Key)));
+    }
     std::tuple<int, int, int, int> WindowPosition = ScreenCapture::GetWindowPosition("Truck Simulator", {"Discord"});
     int DistanceFromRight = 21;
     int DistanceFromBottom = 100;
@@ -278,14 +295,18 @@ std::tuple<std::tuple<int, int>, std::tuple<int, int>, std::tuple<int, int>, std
         float PredictionRight;
         PredictionLeft = PyTorch::Detect(PyTorch::MatToTensor(LeftImage), Variables::Model)[0][0].item<float>();
         PredictionRight = PyTorch::Detect(PyTorch::MatToTensor(RightImage), Variables::Model)[0][0].item<float>();
-        if (PredictionLeft > PredictionRight) {
+        if (PredictionLeft > PredictionRight && PredictionLeft > 0.5) {
+            RouteAdvisorPositionCache[Key] = std::make_tuple(LeftMapTopLeft, LeftMapBottomRight, LeftArrowTopLeft, LeftArrowBottomRight, CurrentTime);
             return {LeftMapTopLeft, LeftMapBottomRight, LeftArrowTopLeft, LeftArrowBottomRight};
         } else {
+            RouteAdvisorPositionCache[Key] = std::make_tuple(LeftMapTopLeft, LeftMapBottomRight, LeftArrowTopLeft, LeftArrowBottomRight, CurrentTime);
             return {RightMapTopLeft, RightMapBottomRight, RightArrowTopLeft, RightArrowBottomRight};
         }
     } else if (Side == "Left") {
+        RouteAdvisorPositionCache[Key] = std::make_tuple(LeftMapTopLeft, LeftMapBottomRight, LeftArrowTopLeft, LeftArrowBottomRight, CurrentTime);
         return {LeftMapTopLeft, LeftMapBottomRight, LeftArrowTopLeft, LeftArrowBottomRight};
     } else if (Side == "Right") {
+        RouteAdvisorPositionCache[Key] = std::make_tuple(LeftMapTopLeft, LeftMapBottomRight, LeftArrowTopLeft, LeftArrowBottomRight, CurrentTime);
         return {RightMapTopLeft, RightMapBottomRight, RightArrowTopLeft, RightArrowBottomRight};
     }
 }
