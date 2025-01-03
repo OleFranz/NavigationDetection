@@ -6,15 +6,26 @@ int main() {
 
 	cv::Mat Frame;
 	cv::Mat Screenshot;
-	float Steering = 0.0f;
+	double LastScreenCaptureCheck = 0.0;
+	double CurrentTime = 0.0;
+	double StartTime = 0.0;
+	double EndTime = 0.0;
 	while (true) {
+		CurrentTime = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch()).count() / 1000000000.0;
+		StartTime = CurrentTime;
 
-		auto [MapTopLeft, MapBottomRight, ArrowTopLeft, ArrowBottomRight] = ScreenCapture::GetRouteAdvisorPosition("Automatic");
-		Screenshot = ScreenCapture::TakeScreenshot(std::get<0>(MapTopLeft), std::get<1>(MapTopLeft), std::get<0>(MapBottomRight), std::get<1>(MapBottomRight));
-		cv::imshow("Screenshot", Screenshot);
+		Frame = ScreenCapture::GetLatestFrame();
+		cv::imshow("Frame", Frame);
 		cv::waitKey(1);
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		//auto [MapTopLeft, MapBottomRight, ArrowTopLeft, ArrowBottomRight] = ScreenCapture::GetRouteAdvisorPosition("Automatic");
+		//Screenshot = ScreenCapture::TakeScreenshot(std::get<0>(MapTopLeft), std::get<1>(MapTopLeft), std::get<0>(MapBottomRight), std::get<1>(MapBottomRight));
+		//cv::imshow("Screenshot", Screenshot);
+		//cv::waitKey(1);
+
+		EndTime = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch()).count() / 1000000000.0;
+
+		std::cout << "FPS: " << 1.0 / (EndTime - StartTime) << std::endl;
 	}
 
 	if (Variables::BUILD_TYPE == "Release") {

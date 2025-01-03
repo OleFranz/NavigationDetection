@@ -299,14 +299,14 @@ std::tuple<std::tuple<int, int>, std::tuple<int, int>, std::tuple<int, int>, std
             RouteAdvisorPositionCache[Key] = std::make_tuple(LeftMapTopLeft, LeftMapBottomRight, LeftArrowTopLeft, LeftArrowBottomRight, CurrentTime);
             return {LeftMapTopLeft, LeftMapBottomRight, LeftArrowTopLeft, LeftArrowBottomRight};
         } else {
-            RouteAdvisorPositionCache[Key] = std::make_tuple(LeftMapTopLeft, LeftMapBottomRight, LeftArrowTopLeft, LeftArrowBottomRight, CurrentTime);
+            RouteAdvisorPositionCache[Key] = std::make_tuple(RightMapTopLeft, RightMapBottomRight, RightArrowTopLeft, RightArrowBottomRight, CurrentTime);
             return {RightMapTopLeft, RightMapBottomRight, RightArrowTopLeft, RightArrowBottomRight};
         }
     } else if (Side == "Left") {
         RouteAdvisorPositionCache[Key] = std::make_tuple(LeftMapTopLeft, LeftMapBottomRight, LeftArrowTopLeft, LeftArrowBottomRight, CurrentTime);
         return {LeftMapTopLeft, LeftMapBottomRight, LeftArrowTopLeft, LeftArrowBottomRight};
     } else if (Side == "Right") {
-        RouteAdvisorPositionCache[Key] = std::make_tuple(LeftMapTopLeft, LeftMapBottomRight, LeftArrowTopLeft, LeftArrowBottomRight, CurrentTime);
+        RouteAdvisorPositionCache[Key] = std::make_tuple(RightMapTopLeft, RightMapBottomRight, RightArrowTopLeft, RightArrowBottomRight, CurrentTime);
         return {RightMapTopLeft, RightMapBottomRight, RightArrowTopLeft, RightArrowBottomRight};
     }
 }
