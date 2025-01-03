@@ -1,15 +1,2 @@
-# Ignore the Datasets
-/RouteAdvisorClassification/Dataset/*
-!/RouteAdvisorClassification/Dataset/*.md
-/RouteAdvisorColorDetection/Dataset/*
-!/RouteAdvisorColorDetection/Dataset/*.md
-
-# Ignore the Models
-/RouteAdvisorClassification/Models/*
-!/RouteAdvisorClassification/Models/*.md
-/RouteAdvisorColorDetection/Models/*
-!/RouteAdvisorColorDetection/Models/*.md
-
-# Ignore the Logs
-/RouteAdvisorClassification/Training/TensorBoard-Logs
-/RouteAdvisorColorDetection/Training/TensorBoard-Logs
+# Ignore the Visual Studio Code files
+/.vscode
