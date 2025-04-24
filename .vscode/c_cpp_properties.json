@@ -1,0 +1,26 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${env:LIBTORCH}/include",
+                "${env:LIBTORCH}/include/torch/csrc/api/include",
+                "${env:LIBTORCHDEBUG}/include",
+                "${env:LIBTORCHDEBUG}/include/torch/csrc/api/include",
+                "${env:OpenCV_DIR}/include"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "windowsSdkVersion": "10.0.22621.0",
+            "compilerPath": "cl.exe",
+            "cStandard": "c23",
+            "cppStandard": "c++23",
+            "intelliSenseMode": "windows-msvc-x64"
+        }
+    ],
+    "version": 4
+}

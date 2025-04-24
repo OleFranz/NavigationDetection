@@ -1,4 +1,6 @@
 # Ignore the Datasets
+/DataCollection/Raw/*
+/DataCollection/Processed/*
 /RouteAdvisorClassification/Dataset/*
 !/RouteAdvisorClassification/Dataset/*.md
 /RouteAdvisorColorDetection/Dataset/*

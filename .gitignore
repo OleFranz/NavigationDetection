@@ -1,2 +1,6 @@
+# Ignore the pycache everywhere
+**/__pycache__
+
 # Ignore the Visual Studio Code files
-/.vscode
+/.vscode/*
+!/.vscode/c_cpp_properties.json
