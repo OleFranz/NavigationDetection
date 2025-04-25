@@ -44,17 +44,16 @@ last_capture_time = time.perf_counter()
 while True:
     start = time.perf_counter()
 
+    is_foreground = ScreenCapture.IsForegroundWindow(Name="Truck Simulator", Blacklist=["Discord"])
     enable_key_pressed = keyboard.is_pressed(enable_key)
 
-    if enable_key_pressed and not last_enable_key_pressed:
+    if enable_key_pressed and not last_enable_key_pressed and is_foreground:
         enabled = not enabled
         window.set_title_bar_color((0, 127, 0) if enabled else (0, 0, 127))
         window.set_border_color((0, 127, 0) if enabled else (0, 0, 127))
 
     last_enable_key_pressed = enable_key_pressed
 
-
-    is_foreground = ScreenCapture.IsForegroundWindow(Name="Truck Simulator", Blacklist=["Discord"])
 
     ScreenCapture.TrackWindowRouteAdvisor(Name="Truck Simulator", Blacklist=["Discord"], Side="Right", Rate=2)
     frame = ScreenCapture.Capture(ImageType="cropped")
